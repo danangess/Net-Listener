@@ -209,6 +209,22 @@ class Main():
 # Standard boilerplate to call the main() function to begin
 # the program.
 if __name__ == '__main__':
+    path = __file__
+    p1 = subprocess.Popen(["ps", "ax"], stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(["grep", path], stdin=p1.stdout, stdout=subprocess.PIPE)
+    p1.stdout.close()
+    proc = p2.communicate()[0].split("\n")
+    if len(proc) == 4:
+        pid = proc[0].split()[0]
+        os.kill(int(pid), signal.SIGTERM)
+    elif len(proc) > 4:
+        for p in proc:
+            try:
+                pid = p.split()[0]
+                os.kill(int(pid), signal.SIGTERM)
+            except Exception, e:
+                pass
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     main = Main()
     main.main()
